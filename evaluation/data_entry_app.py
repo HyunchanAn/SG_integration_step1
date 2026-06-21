@@ -4,7 +4,6 @@ import time
 import shutil
 import pandas as pd
 import streamlit as st
-from PIL import Image
 
 # ---------------------------------------------------------------------------
 # Page Config
@@ -144,7 +143,8 @@ def save_image(uploaded_file):
     if uploaded_file is None:
         return None
     ext = uploaded_file.name.split('.')[-1].lower()
-    if ext not in ['jpg', 'jpeg', 'png']: ext = 'jpg'
+    if ext not in ['jpg', 'jpeg', 'png']:
+        ext = 'jpg'
     filename = f"{int(time.time())}_{str(uuid.uuid4())[:8]}.{ext}"
     filepath = os.path.join(IMG_DIR, filename)
     

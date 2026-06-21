@@ -1,6 +1,5 @@
 import torch
 import numpy as np
-import cv2
 import time
 
 class DepthAnythingV2Wrapper:

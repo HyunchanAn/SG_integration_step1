@@ -166,8 +166,8 @@ def test_curvature_pipeline():
     g_curv = curv_a.calculate_gaussian_curvature(dmap, mask=mask)
     cvals, ccoords = curv_a.find_critical_points(g_curv, mask=mask, top_k=1)
     
-    k_max = cvals[0]
-    r_px = 1.0 / np.sqrt(np.abs(k_max)) if k_max != 0 else 0
-    r_mm = r_px * 1.0
+    # k_max = cvals[0]
+    # r_px = 1.0 / np.sqrt(np.abs(k_max)) if k_max != 0 else 0
+    # r_mm = r_px * 1.0
     
     assert len(ccoords) > 0, "Failed to locate critical curvature points"

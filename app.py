@@ -7,9 +7,7 @@ Integrated Surface Analysis Platform
 """
 import io
 import os
-import sys
 import time
-import urllib.request
 
 import cv2
 import matplotlib
@@ -20,6 +18,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 from PIL import Image
+from huggingface_hub import hf_hub_download
 
 # ---------------------------------------------------------------------------
 # Streamlit 1.34+ 호환성 패치 (image_to_url 누락 대응)
@@ -32,7 +31,9 @@ if not hasattr(_st_image, "image_to_url"):
             rt = _get_inst()
             if not isinstance(data, (bytes, bytearray)):
                 img = Image.fromarray(data) if not isinstance(data, Image.Image) else data
-                buf = io.BytesIO(); img.save(buf, format="PNG"); data = buf.getvalue()
+                buf = io.BytesIO()
+                img.save(buf, format="PNG")
+                data = buf.getvalue()
             return rt.media_file_mgr.add(data, "image/png", width, image_id)
         _st_image.image_to_url = _image_to_url
     except Exception:
@@ -53,15 +54,15 @@ torch.set_num_threads(1)
 # ---------------------------------------------------------------------------
 # 핵심 라이브러리 임포트
 # ---------------------------------------------------------------------------
-from deepdrop_sfe import AIContactAngleAnalyzer, DropletPhysics, PerspectiveCorrector
-from vsams.analysis.surface_evaluator import SurfaceEvaluator
-from src.seg.sam2_wrapper import SAM2BaseWrapper
-from src.topo.depth_wrapper import DepthAnythingV2Wrapper
-from src.curv.curvature import CurvatureAnalyzer
-from contamination_engine import IntegratedEngine
+from deepdrop_sfe import AIContactAngleAnalyzer, DropletPhysics, PerspectiveCorrector  # noqa: E402
+from vsams.analysis.surface_evaluator import SurfaceEvaluator  # noqa: E402
+from src.seg.sam2_wrapper import SAM2BaseWrapper  # noqa: E402
+from src.topo.depth_wrapper import DepthAnythingV2Wrapper  # noqa: E402
+from src.curv.curvature import CurvatureAnalyzer  # noqa: E402
+from contamination_engine import IntegratedEngine  # noqa: E402
 
 # ---------------------------------------------------------------------------
-# Page Config (반드시 맨 앞에서 호출해야 함)
+# Page Config (반드시 st 관련 호출 중 맨 앞에서 호출해야 함)
 # ---------------------------------------------------------------------------
 st.set_page_config(
     page_title="Integrated Surface Analysis",
@@ -72,7 +73,6 @@ st.set_page_config(
 # ---------------------------------------------------------------------------
 # 런타임 동적 프로파일링 및 최적화 초기화
 # ---------------------------------------------------------------------------
-import torch
 
 def initialize_environment():
     is_cloud = (not torch.cuda.is_available()) or (os.getenv("STREAMLIT_SERVER_MODE") == "cloud")
@@ -662,8 +662,6 @@ with st.expander("STEP 1.  설정 및 이미지 등록" if lang == "ko" else "ST
 # ---------------------------------------------------------------------------
 # Model 캐싱 로드
 # ---------------------------------------------------------------------------
-import hashlib
-from huggingface_hub import hf_hub_download
 
 @st.cache_resource(show_spinner=False)
 def _load_engines():
@@ -762,14 +760,20 @@ def _droplet_plot(ca_deg: float):
     ax.plot([-1.5, 1.5], [0, 0], color="#475569", linewidth=2)
     r = 1.0
     if ca_deg < 90:
-        R = r / np.sin(theta); yc = -r / np.tan(theta)
+        R = r / np.sin(theta)
+        yc = -r / np.tan(theta)
         c = plt.Circle((0, yc), R, color="#38BDF8", alpha=0.55)
-        ax.add_patch(c); ax.set_ylim(0, 1.5)
+        ax.add_patch(c)
+        ax.set_ylim(0, 1.5)
     else:
-        R = r / np.sin(np.pi - theta); yc = -r / np.tan(theta)
+        R = r / np.sin(np.pi - theta)
+        yc = -r / np.tan(theta)
         c = plt.Circle((0, yc), R, color="#0284C7", alpha=0.55)
-        ax.add_patch(c); ax.set_ylim(0, 2.2)
-    ax.set_xlim(-1.5, 1.5); ax.set_aspect("equal"); ax.axis("off")
+        ax.add_patch(c)
+        ax.set_ylim(0, 2.2)
+    ax.set_xlim(-1.5, 1.5)
+    ax.set_aspect("equal")
+    ax.axis("off")
     plt.tight_layout()
     return fig
 
@@ -989,7 +993,7 @@ with st.expander("STEP 2.  " + T["tab1"], expanded=True):
                                 
                                 contours, _ = cv2.findContours(mask_bin, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
                                 cv2.drawContours(prev, contours, -1, (255, 50, 50), 4)
-                            except Exception as mask_err:
+                            except Exception:
                                 pass
                                 
                         x1, y1, x2, y2 = map(int, coin_box)
@@ -1170,7 +1174,7 @@ with st.expander("STEP 2.  " + T["tab1"], expanded=True):
                                         else:
                                             drop_box = None # 유효하지 않으면 강제 실패 처리
                                             
-                                    except Exception as d_mask_err:
+                                    except Exception:
                                         pass
                                         
                                 if drop_box is not None:
@@ -1234,10 +1238,14 @@ with st.expander("STEP 2.  " + T["tab1"], expanded=True):
                         st.markdown("---")
                         st.markdown("#### 3. 측정 결과" if lang == "ko" else "#### 3. Measurement Result")
                         c1, c2, c3, c4 = st.columns(4)
-                        with c1: _card(f"{res['px_mm']:.1f} px/mm", "Pixel Scale")
-                        with c2: _card(f"{res['d_mm']:.3f} mm", "Contact Diameter")
-                        with c3: _card(f"{res['ca']:.1f}\u00b0", "Contact Angle")
-                        with c4: _card(f"{res.get('time', 0):.2f} s", "Inference Time" if lang == "en" else "추론 시간")
+                        with c1:
+                            _card(f"{res['px_mm']:.1f} px/mm", "Pixel Scale")
+                        with c2:
+                            _card(f"{res['d_mm']:.3f} mm", "Contact Diameter")
+                        with c3:
+                            _card(f"{res['ca']:.1f}\u00b0", "Contact Angle")
+                        with c4:
+                            _card(f"{res.get('time', 0):.2f} s", "Inference Time" if lang == "en" else "추론 시간")
                         st.pyplot(_droplet_plot(res["ca"]))
 
                         # SFE 테이블에 추가
@@ -1287,9 +1295,12 @@ with st.expander("STEP 2.  " + T["tab1"], expanded=True):
                 if tot is not None:
                     st.session_state["sfe_calc_result"] = {"total": tot, "disp": gd, "polar": gp}
                     c1, c2, c3 = st.columns(3)
-                    with c1: _card(f"{tot:.2f} mN/m", "Total SFE")
-                    with c2: _card(f"{gd:.2f} mN/m", "Dispersive")
-                    with c3: _card(f"{gp:.2f} mN/m", "Polar")
+                    with c1:
+                        _card(f"{tot:.2f} mN/m", "Total SFE")
+                    with c2:
+                        _card(f"{gd:.2f} mN/m", "Dispersive")
+                    with c3:
+                        _card(f"{gp:.2f} mN/m", "Polar")
 
 # =========================================================================
 # STEP 3 — Surface Finish (V-SAMS)
@@ -1333,9 +1344,12 @@ with st.expander("STEP 3.  " + T["tab2"], expanded=False):
             vr = st.session_state["v_sams_result"]
             st.markdown("---")
             c1, c2, c3 = st.columns(3)
-            with c1: _card(f"{vr['roughness']:.4f} μm", "조도 (Ra)" if lang == "ko" else "Roughness (Ra)")
-            with c2: _card(f"{vr['gloss']:.1f} GU", "광택도 (Gloss)" if lang == "ko" else "Gloss Unit")
-            with c3: _card(vr["predicted_label"], "마감 분류" if lang == "ko" else "Finish Class")
+            with c1:
+                _card(f"{vr['roughness']:.4f} μm", "조도 (Ra)" if lang == "ko" else "Roughness (Ra)")
+            with c2:
+                _card(f"{vr['gloss']:.1f} GU", "광택도 (Gloss)" if lang == "ko" else "Gloss Unit")
+            with c3:
+                _card(vr["predicted_label"], "마감 분류" if lang == "ko" else "Finish Class")
 
 # =========================================================================
 # STEP 4 — 3D Curvature (SG-TERRA)
@@ -1507,8 +1521,10 @@ with st.expander("STEP 4.  " + T["tab3"], expanded=False):
             cr = st.session_state["curv_result"]
             st.markdown("---")
             c1, c2 = st.columns(2)
-            with c1: _card(f"{cr['max_k']:.5f}", "Max Gaussian Curvature (K)")
-            with c2: _card(f"R \u2248 {cr['min_r_mm']} mm", "Min Curvature Radius (R)")
+            with c1:
+                _card(f"{cr['max_k']:.5f}", "Max Gaussian Curvature (K)")
+            with c2:
+                _card(f"R \u2248 {cr['min_r_mm']} mm", "Min Curvature Radius (R)")
 
 # =========================================================================
 # STEP 5 — Surface Contamination (005)

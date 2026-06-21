@@ -66,4 +66,27 @@ dev = [
 [tool.ruff]
 line-length = 120
 target-version = "py310"
-exclude = [".git", "__pycache__", "build", "dist", ".venv"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".venv",
+    "src/topo/depth_anything_v2",
+    "tools",
+]
+
+[tool.mypy]
+ignore_missing_imports = true
+exclude = [
+    "evaluation",
+    "vsams",
+    "sfe",
+    "contamination",
+    "src/topo",
+    "src/seg",
+    "src/curv",
+    "deepdrop_sfe",
+    "tools",
+    "app.py",
+]

@@ -116,7 +116,7 @@ class SurfaceEvaluator:
         try:
             import streamlit as st
             max_dim = st.session_state.get("max_image_size") or float('inf')
-        except:
+        except Exception:
             max_dim = 800.0
         scale = 1.0
         
