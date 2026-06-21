@@ -4,14 +4,54 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sg-integration-step1"
-version = "0.1.0"
-description = "SG Platform Module sg-integration-step1"
+version = "1.0.0"
+description = "Integrated Surface Analysis & Contamination Detection Platform (SFE, V-SAMS, SG-TERRA, Contamination)"
 readme = "README.md"
 requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "HyunchanAn" }
+]
 dependencies = [
-    "fastapi>=0.100.0",
-    "uvicorn>=0.22.0",
+    "streamlit>=1.39.0",
+    "streamlit-drawable-canvas",
+    "streamlit-javascript",
+    "streamlit-image-coordinates",
+    "plotly>=5.10.0",
+    "opencv-python-headless",
+    "timm",
+    "Pillow>=11.0.0",
+    "albumentations",
+    "scikit-learn",
+    "numpy>=1.26.0",
+    "scipy",
+    "pandas",
+    "matplotlib",
+    "tqdm",
+    "huggingface_hub",
+    "requests",
     "pydantic>=2.0.0",
+    "torch",
+    "torchvision",
+    "sam-2 @ git+https://github.com/facebookresearch/segment-anything-2.git",
+    "mobile-sam @ git+https://github.com/ChaoningZhang/MobileSAM.git",
+    "anomalib>=2.2.0",
+    "openvino",
+    "scikit-image",
+    "lightning",
+    "pytorch-lightning",
+    "einops",
+    "kornia",
+    "freia",
+    "watchdog",
+    "hydra-core",
+    "omegaconf",
+    "pycocotools",
+    "loguru",
+    "pydantic-settings",
+    "gradio",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.22.0"
 ]
 
 [project.optional-dependencies]
@@ -20,11 +60,10 @@ dev = [
     "pytest-cov>=4.0.0",
     "ruff>=0.1.0",
     "mypy>=1.4.0",
+    "pre-commit"
 ]
 
 [tool.ruff]
-line-length = 100
-
-[tool.mypy]
-strict = false
-ignore_missing_imports = true
+line-length = 120
+target-version = "py310"
+exclude = [".git", "__pycache__", "build", "dist", ".venv"]

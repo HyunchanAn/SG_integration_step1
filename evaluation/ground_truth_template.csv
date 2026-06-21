@@ -1,0 +1,4 @@
+module_type,filename_1,filename_2,true_contact_angle_1,true_contact_angle_2,true_sfe,true_ra,true_gloss,true_finish,true_curvature_r
+SFE,example_water.jpg,example_diiodomethane.jpg,65.2,45.1,35.5,,,,,
+VSAMS,example_finish.jpg,,,,,,0.15,120,BA,
+3D,example_3d.jpg,,,,,,,,,15.5
