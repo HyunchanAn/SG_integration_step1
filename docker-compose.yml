@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  sg_integration_step1:
+    build: .
+    ports:
+      - "8014:8000"
+    restart: unless-stopped
