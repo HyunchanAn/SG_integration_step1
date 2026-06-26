@@ -90,3 +90,7 @@ exclude = [
     "tools",
     "app.py",
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["utils*"]
