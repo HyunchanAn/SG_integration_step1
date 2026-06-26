@@ -24,9 +24,9 @@ def test_imports():
 
     # 007 (src)
     try:
-        from src.seg.sam2_wrapper import SAM2BaseWrapper
-        from src.topo.depth_wrapper import DepthAnythingV2Wrapper
-        from src.curv.curvature import CurvatureAnalyzer
+        from sg_terra.seg.sam2_wrapper import SAM2BaseWrapper
+        from sg_terra.topo.depth_wrapper import DepthAnythingV2Wrapper
+        from sg_terra.curv.curvature import CurvatureAnalyzer
         assert SAM2BaseWrapper is not None
         assert DepthAnythingV2Wrapper is not None
         assert CurvatureAnalyzer is not None
