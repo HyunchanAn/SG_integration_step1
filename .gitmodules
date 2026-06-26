@@ -1,0 +1,9 @@
+[submodule "SG_proj_002"]
+	path = SG_proj_002
+	url = https://github.com/HyunchanAn/SG_proj_002.git
+[submodule "SG_proj_003"]
+	path = SG_proj_003
+	url = https://github.com/HyunchanAn/SG_proj_003.git
+[submodule "SG_proj_007"]
+	path = SG_proj_007
+	url = https://github.com/HyunchanAn/SG_proj_007.git

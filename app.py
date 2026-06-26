@@ -52,13 +52,23 @@ import torch
 torch.set_num_threads(1)
 
 # ---------------------------------------------------------------------------
+# 서브모듈 Path 동적 추가 (Git Submodule 연동)
+# ---------------------------------------------------------------------------
+import sys
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(BASE_DIR, "SG_proj_002"))
+sys.path.append(os.path.join(BASE_DIR, "SG_proj_003"))
+sys.path.append(os.path.join(BASE_DIR, "SG_proj_007"))
+
+# ---------------------------------------------------------------------------
 # 핵심 라이브러리 임포트
 # ---------------------------------------------------------------------------
 from deepdrop_sfe import AIContactAngleAnalyzer, DropletPhysics, PerspectiveCorrector  # noqa: E402
 from vsams.analysis.surface_evaluator import SurfaceEvaluator  # noqa: E402
-from src.seg.sam2_wrapper import SAM2BaseWrapper  # noqa: E402
-from src.topo.depth_wrapper import DepthAnythingV2Wrapper  # noqa: E402
-from src.curv.curvature import CurvatureAnalyzer  # noqa: E402
+from sg_terra.seg.sam2_wrapper import SAM2BaseWrapper  # noqa: E402
+from sg_terra.topo.depth_wrapper import DepthAnythingV2Wrapper  # noqa: E402
+from sg_terra.curv.curvature import CurvatureAnalyzer  # noqa: E402
 from contamination_engine import IntegratedEngine  # noqa: E402
 
 # ---------------------------------------------------------------------------
