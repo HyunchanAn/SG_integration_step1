@@ -35,4 +35,4 @@ jobs:
         
     - name: Run tests with pytest
       run: |
-        PYTHONPATH=SG_proj_002:SG_proj_003:SG_proj_007 pytest --cov=.
+        PYTHONPATH=SG_proj_002:SG_proj_003:SG_proj_007 pytest tests/ --cov=.
