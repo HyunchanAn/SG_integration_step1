@@ -1,3 +1,4 @@
+# 불량 오염도 측정 앱(step1)의 비전 결합 물리량(SFE, 마감, 3D 가우시안 곡률) 통합 분석 파이프라인 무결성을 검증하는 테스트 코드입니다.
 import sys
 import os
 import cv2
