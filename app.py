@@ -1577,29 +1577,8 @@ with st.expander("STEP 5.  오염 정도 판별" if lang == "ko" else "STEP 5.  
                         except Exception as e:
                             st.error(f"Error during contamination analysis: {e}")
                     else:
-                        # Fallback Mock logic
-                        import time
-                        time.sleep(0.5)
-                        h, w = rgb_c.shape[:2]
-                        dummy_heatmap = np.zeros((h, w), dtype=np.uint8)
-                        cv2.circle(dummy_heatmap, (w//2, h//2), 100, 255, -1)
-                        dummy_heatmap = cv2.GaussianBlur(dummy_heatmap, (51, 51), 0)
-                        heatmap_img = cv2.applyColorMap(dummy_heatmap, cv2.COLORMAP_JET)
-                        heatmap_img = cv2.cvtColor(heatmap_img, cv2.COLOR_BGR2RGB)
-                        heatmap_overlay = Image.fromarray(cv2.addWeighted(rgb_c, 0.6, heatmap_img, 0.4, 0))
-                        
-                        dummy_mask = np.zeros((h, w), dtype=np.uint8)
-                        cv2.circle(dummy_mask, (w//2, h//2), 90, 255, -1)
-                        mask_overlay = rgb_c.copy()
-                        mask_overlay[dummy_mask > 0] = [255, 0, 0]
-                        sam2_overlay = Image.fromarray(cv2.addWeighted(rgb_c, 0.5, mask_overlay, 0.5, 0))
-                        
-                        st.session_state["contam_result"] = {
-                            "score": 0.62,
-                            "heatmap": heatmap_overlay,
-                            "sam2": sam2_overlay,
-                            "is_abnormal": True
-                        }
+                        st.warning("Anomaly Detection 모델 가중치 파일(PatchCore/SAM2)을 찾을 수 없거나 초기화되지 않아 오염도 판별을 수행할 수 없습니다.")
+                        st.session_state["contam_result"] = None
             
             res_c = st.session_state.get("contam_result")
             if res_c is not None:
