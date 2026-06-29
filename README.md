@@ -39,3 +39,6 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
+
+## 최신 업데이트 내역 (2026-06-29)
+- 초기 기동 및 디버깅 시 강제 주입되던 0.62 오염도 모의 스코어를 제거하고, 비초기화 모델에 대한 Warning 안전 우회 분기(Fallback) 구현.
