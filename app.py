@@ -7,7 +7,11 @@ Integrated Surface Analysis Platform
 """
 import io
 import os
+import sys
 import time
+import gc
+import torch
+from loguru import logger
 
 import cv2
 import matplotlib
@@ -39,6 +43,21 @@ if not hasattr(_st_image, "image_to_url"):
     except Exception:
         pass
 
+# Loguru Logger 설정
+logger.remove()
+logger.add(
+    sys.stdout,
+    format="<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>",
+    level="INFO"
+)
+logger.add(
+    "logs/step1_app_{time:YYYY-MM-DD}.log",
+    rotation="10 MB",
+    retention="10 days",
+    format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} - {message}",
+    level="WARNING"
+)
+
 # streamlit_image_coordinates - 선택적 임포트
 try:
     from streamlit_image_coordinates import streamlit_image_coordinates
@@ -46,16 +65,14 @@ try:
 except ImportError:
     HAS_IMG_COORDS = False
 
-import gc
-import torch
+# gc & torch imported at top
 # Streamlit Cloud의 가용 RAM 한계(OOM) 극복을 위해 CPU 연산 스레드 및 메모리 스파이크 제한
 torch.set_num_threads(1)
 
 # ---------------------------------------------------------------------------
 # 서브모듈 Path 동적 추가 (Git Submodule 연동)
 # ---------------------------------------------------------------------------
-import sys
-import os
+# sys & os imported at top
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(BASE_DIR, "SG_proj_002"))
 sys.path.append(os.path.join(BASE_DIR, "SG_proj_003"))
@@ -740,6 +757,7 @@ with st.spinner(T["loading"]):
 def _load_img(uploaded, max_size=800):
     """UploadedFile -> (bgr, rgb) numpy arrays, 메모리 오버헤드 방지를 위한 자동 리사이징"""
     # 렌더링/업로드 순간마다 쌓이는 이전 메모리를 명시적으로 해제
+    logger.debug("Garbage collection triggered in _load_img to free memory spikes.")
     gc.collect()
 
     raw = np.asarray(bytearray(uploaded.read()), dtype=np.uint8)
@@ -750,7 +768,12 @@ def _load_img(uploaded, max_size=800):
     h, w = bgr.shape[:2]
     if max(h, w) > max_size:
         scale = max_size / float(max(h, w))
-        bgr = cv2.resize(bgr, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)
+        target_w = int(w * scale)
+        target_h = int(h * scale)
+        logger.info(f"OOM Prevention: Resizing input image from {w}x{h} to {target_w}x{target_h} (scale: {scale:.4f}, max_size: {max_size})")
+        bgr = cv2.resize(bgr, (target_w, target_h), interpolation=cv2.INTER_AREA)
+    else:
+        logger.info(f"Input image loaded at original resolution: {w}x{h}")
 
     rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
     return bgr, rgb
@@ -1303,6 +1326,15 @@ with st.expander("STEP 2.  " + T["tab1"], expanded=True):
                 calc_in = [{"liquid": m["Liquid"], "angle": m["Angle"]} for m in st.session_state["m_list"]]
                 tot, gd, gp = DropletPhysics.calculate_owrk(calc_in)
                 if tot is not None:
+                    # 도메인 한계 임계치 (10.0 ~ 100.0 mN/m) 검증
+                    if tot < 10.0 or tot > 100.0:
+                        logger.warning(f"Domain Validation Warning: SFE {tot:.2f} mN/m is out of range [10.0, 100.0]")
+                        st.error("경고: 계산된 표면 자유 에너지(SFE)가 물리 화학적 타당 범위(10.0 ~ 100.0 mN/m)를 벗어났습니다. 입력된 이미지 및 액적 접촉각을 다시 점검해 주십시오." 
+                                 if lang == "ko" else 
+                                 "Warning: Computed SFE is out of physical domain limits (10.0 ~ 100.0 mN/m). Please verify input images and contact angles.")
+                    else:
+                        logger.info(f"SFE calculation success: Total: {tot:.2f}, Dispersive: {gd:.2f}, Polar: {gp:.2f}")
+                    
                     st.session_state["sfe_calc_result"] = {"total": tot, "disp": gd, "polar": gp}
                     c1, c2, c3 = st.columns(3)
                     with c1:
