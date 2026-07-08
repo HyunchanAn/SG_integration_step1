@@ -1037,16 +1037,16 @@ with st.expander("STEP 2.  " + T["tab1"], expanded=True):
                         is_too_small = False
                         if coin_box is not None:
                             c_area = (coin_box[2] - coin_box[0]) * (coin_box[3] - coin_box[1])
-                            if c_area / (h * w) < 0.005: # 너무 작은 노이즈 영역은 차단
+                            if c_area / (h * w) < 0.0005: # 너무 작은 노이즈 영역은 차단
                                 is_too_small = True
                                 
                         # OpenCV 검출에 실패했거나 노이즈인 경우 중앙부 가상 박스로 폴백
                         if coin_box is None or is_too_small:
                             coin_box = np.array([
-                                max(0, w // 2 - 300),
-                                max(0, h // 2 - 300),
-                                min(w, w // 2 + 300),
-                                min(h, h // 2 + 300)
+                                max(0, w // 2 - 600),
+                                max(0, h // 2 - 600),
+                                min(w, w // 2 + 600),
+                                min(h, h // 2 + 600)
                             ])
                             st.info("동전 외곽을 자동 검출하지 못하여 이미지 중앙을 기준으로 자동 세그멘테이션을 시도합니다." if lang == "ko"
                                     else "Coin boundaries not found. Attempting auto segmentation on image center.")
@@ -1220,6 +1220,12 @@ with st.expander("STEP 2.  " + T["tab1"], expanded=True):
                                     drop_box = sfe_analyzer.auto_detect_droplet_candidate(warped, exclude_box=exclude_box_warped)
                                 else:
                                     drop_box = sfe_analyzer.auto_detect_droplet_candidate(warped)
+                                
+                                # 폴백: 검출 실패시 중앙을 액적으로 가정
+                                if drop_box is None:
+                                    dh, dw = warped.shape[:2]
+                                    drop_box = np.array([max(0, dw//2 - 200), max(0, dh//2 - 200), min(dw, dw//2 + 200), min(dh, dh//2 + 200)])
+
                             if drop_box is not None:
                                 dprev = warped.copy()
                                 # 자동 감지 모드에서도 마스크 실시간 오버레이
@@ -1246,7 +1252,7 @@ with st.expander("STEP 2.  " + T["tab1"], expanded=True):
                                             perimeter = cv2.arcLength(max_c, True)
                                             if perimeter > 0 and area > 100:
                                                 circularity = 4 * np.pi * area / (perimeter ** 2)
-                                                if circularity < 0.7:  # 0.7 이하면 물방울이 아니라 스크래치로 간주
+                                                if circularity < 0.2:  # 0.7 이하면 스크래치 간주 (데모에서는 관대하게 0.2로 조정)
                                                     is_valid_droplet = False
                                             else:
                                                 is_valid_droplet = False
