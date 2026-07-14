@@ -261,3 +261,12 @@
   - SFE 및 마감 평가용 시약(물, 글리세롤)과 반사광 기본 이미지 경로를 설정하고 자동 매핑되도록 처리함.
   - 3D 곡률 분석은 기본 수행하도록 옵션을 True로 지정하고 기본 예제 이미지가 자동 삽입되도록 구현함.
   - 오염 판별(Anomaly) 분석 이미지 업로드 슬롯 또한 동일한 체크박스 기반의 조건부 렌더링으로 통일하여 시연 흐름을 최적화함.
+
+---
+Date: 2026-07-14
+Author: Antigravity
+
+[Updates]
+- Hardware Specs updated in README.md from RTX 5080/Windows to Apple M2 Pro/macOS.
+- Completed all local E2E and unit tests on macOS successfully without abort traps.
+- Verified GitHub Actions CI/CD workflows for the projects.
