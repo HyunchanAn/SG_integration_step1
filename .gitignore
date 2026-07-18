@@ -55,3 +55,7 @@ vsams/data/visual_library.pth
 .vscode/
 *.swp
 *.swo
+
+# Security Rules Auto-Appended
+raw_data/
+*.db
