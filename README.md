@@ -1,6 +1,7 @@
 # 통합 표면 분석 플랫폼 - Step 1: 계측 (SG_integration_step1)
 
 ![Status](https://img.shields.io/badge/Status-v1.1%20Release-brightgreen) ![Python](https://img.shields.io/badge/Python-3.12-blue) ![Framework](https://img.shields.io/badge/Framework-Streamlit_PyTorch-orange)
+![Hardware](https://img.shields.io/badge/Hardware-Mac_M2_Pro_%7C_Win_RTX5080-lightgrey)
 
 ## 1. 개요
 표면 자유 에너지(SFE) 분석, 표면 마감 상태 평가, 3D 지형 및 곡률 분석 기능을 하나의 인터페이스로 제공하는 통합 계측 플랫폼입니다. 파이프라인의 첫 번째 단계(Step 1)로서, 사용자가 입력한 이미지로부터 핵심 물리량을 추출하여 다음 의사결정 모듈로 전달합니다.
@@ -44,3 +45,6 @@ streamlit run app.py
 ## 최신 업데이트 내역 (2026-07-05)
 - [CI/CD]: 통합 E2E 테스트 검사 통과 및 전체 모듈 연동 보고서 발간 완료. (2026-06-29)
 - 초기 기동 및 디버깅 시 강제 주입되던 0.62 오염도 모의 스코어를 제거하고, 비초기화 모델에 대한 Warning 안전 우회 분기(Fallback) 구현.
+
+---
+*Last Updated: 2026-07-19 (Hybrid Environment & MSA Integration)*
