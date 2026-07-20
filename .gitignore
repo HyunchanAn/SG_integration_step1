@@ -59,3 +59,6 @@ vsams/data/visual_library.pth
 # Security Rules Auto-Appended
 raw_data/
 *.db
+*.log
+.coverage
+.pytest_cache/
